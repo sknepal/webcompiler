@@ -2,7 +2,7 @@ from flask import Flask, request
 from flask_restful import Resource, Api, reqparse
 from flask import jsonify
 import subprocess
-import urllib
+import urllib, os
 app = Flask(__name__)
 api = Api(app)
 
@@ -18,14 +18,18 @@ class RunC(Resource):
          file.write(code)
       p = subprocess.Popen(['gcc', 'test.c', '-o', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
       out, err = p.communicate()
+      if os.path.exists('test.c'):
+          os.remove('test.c')
       if (err):
           print "Error"
-          response.append({'success':'false','error':err})
-          return jsonify(result = response)
+          response.append({'error':err})
+          return response, 412
       print "Success"
       q = subprocess.check_output(['./test'])
-      response.append({'success':'true','output':q})
-      return jsonify(result = response)
+      response.append({'output':q})
+      if os.path.exists('test'):
+          os.remove('test')
+      return response, 200
       
 
 class RunPython(Resource):
@@ -40,14 +44,15 @@ class RunPython(Resource):
          file.write(code)
       p = subprocess.Popen(['python', 'test.py'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
       out, err = p.communicate()
+      if os.path.exists('test.py'):
+          os.remove('test.py')
       if (err):
           print "Error"
-          response.append({'success':'false','error':err})
-          return jsonify(result = response)
+          response.append({'error':err})
+          return response, 412
       print "Success"
-      #q = subprocess.check_output(['./test'])
-      response.append({'success':'true','output':out})
-      return jsonify(result = response)
+      response.append({'output':out})
+      return response, 200
       
            
         

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>ACE in Action</title>
+<style type="text/css" media="screen">
+	    #ace-editor {
+	        position: absolute;
+	        width: 500px;
+	        height: 400px;
+	    }
+	    </style>
+</head>
+<body>
+	<textarea rows="5" cols="10" class="code" name="ace-editor" style="display: none;"></textarea>
+	    <div style="height:450px; border:1px solid #000;">
+	        <div id="ace-editor"></div>
+	    </div>
+	<input type="submit" name="submit" value="submit" id="submit"/>
+	<textarea rows="5" cols="30" name="message"></textarea>
+<script src="src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://code.jquery.com/jquery-1.12.4.min.js" type="text/javascript"></script>
+
+ <script>
+    var editor = ace.edit("ace-editor");
+    editor.setTheme("ace/theme/monokai");
+    editor.getSession().setMode("ace/mode/c_cpp");
+	var textarea = $('textarea[name="ace-editor"]');
+	var messagearea = $('textarea[name="message"]');
+	editor.getSession().on("change", function () {
+	    textarea.val(editor.getSession().getValue());
+	});
+	$('#submit').click(function(){
+	var code = encodeURI(textarea.val())
+	$.ajax({
+	    type: 'POST',
+	    url: 'http://127.0.0.1:5000/C/',
+	    dataType: 'json',
+		data: JSON.stringify({"code":code}),
+		contentType: "application/json",
+	    cache: false
+	}).done(function(data, textStatus, xhr) {
+		messagearea.val("Success!\n" + data[0].output);
+
+	}).fail(function(data, textStatus, xhr) { 
+		messagearea.val("Error!\n" + data.responseJSON[0].error);
+	});	
+	});
+</script> 
+</body>
+</html>
