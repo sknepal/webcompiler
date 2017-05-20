@@ -1,0 +1,44 @@
+#ace-editor {
+    height: 60vh;
+}
+#content {
+    border: 1px solid #ddd;
+    height: 60vh;
+    width: 100%;
+    background: #fafafa;
+}
+.h3Title{
+    color: #1e4473;
+}
+.mainSpan{
+    font-weight: bold;
+}
+.codePlaySpan{
+    font-size: 16px;
+}
+.pdR0{
+    padding-right:0;
+}
+.pdL6{
+    padding-left: 6px;
+}
+.pdL0{
+    padding-left:0;
+}
+button#btnRun {
+    background: #1e4473;
+    border-radius: 0;
+    border: 1px solid rgb(30, 68, 115);
+    padding: 4px 33px;
+    font-size: 15px;
+    color: #fff;
+}
+div#menuButtons {
+    padding: 10px;
+}
+.ioTxt{
+    display: inline-block;
+    background: rgb(94, 128, 169);
+    padding: 1px 14px;
+    color: #fff;
+}
