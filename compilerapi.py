@@ -25,17 +25,11 @@ class RunC(Resource):
           response.append({'error':err})
           return response, 412
       print "Success"
-      q = subprocess.Popen(['./test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
-      (stdout, stderr) = q.communicate()
-      print q.stdin.readline()
-      # if sys.stdin.isatty():
-#           print "Nothing in the STDIN - 2 "
-#       else:
-#           print "Something in the STDIN - 1"
-      # response.append({'output':q})
- #      if os.path.exists('test'):
- #          os.remove('test')
- #      return response, 200
+      q = subprocess.check_output(['./test'])
+      response.append({'output':q})
+      if os.path.exists('test'):
+          os.remove('test')
+      return response, 200
       
 
 class RunPython(Resource):

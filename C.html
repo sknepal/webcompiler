@@ -65,7 +65,7 @@
 		editor.getSession().on("change", function() {
 			textarea.val(editor.getSession().getValue());
 		});
-		$('#submit').click(function() {
+		$('#btnRun').click(function() {
 			var code = encodeURI(textarea.val())
 			$.ajax({
 				type: 'POST',
