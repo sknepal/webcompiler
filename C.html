@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>Run Python Online</title>
+<title>Run C Online</title>
 <link rel="stylesheet" type="text/css" href="bootstrap.min.css">
 <style type="text/css" media="screen">
 	    #ace-editor {
@@ -25,8 +25,8 @@
 			    <div class="panel panel-default">
 			        <div class="panel-heading">
 						<ul class="nav nav-tabs">
-						  <li class="active"><a href="index.html">Python</a></li>
-						  <li><a href="C.html">C</a></li>
+						  <li><a href="index.html">Python</a></li>
+						  <li class="active"><a href="C.html">C</a></li>
 						</ul>
 			           
 			        </div>
@@ -49,10 +49,15 @@
 					       <br/>
 					   </div>
 					   <textarea rows="5" cols="10" class="code" name="ace-editor" style="display: none;"></textarea>
+	    <!-- </div> -->
+	<!-- <input type="submit" name="submit" value="submit" id="submit"/> -->
+	<!-- <textarea rows="5" cols="30" name="message"></textarea> -->
+
+
  <script>
     var editor = ace.edit("ace-editor");
     editor.setTheme("ace/theme/monokai");
-    editor.getSession().setMode("ace/mode/python");
+    editor.getSession().setMode("ace/mode/c_cpp");
 	var textarea = $('textarea[name="ace-editor"]');
 	var messagearea = $('textarea[name="message"]');
 	editor.getSession().on("change", function () {
@@ -62,7 +67,7 @@
 	var code = encodeURI(textarea.val())
 	$.ajax({
 	    type: 'POST',
-	    url: 'http://127.0.0.1:5000/python/',
+	    url: 'http://127.0.0.1:5000/C/',
 	    dataType: 'json',
 		data: JSON.stringify({"code":code}),
 		contentType: "application/json",
