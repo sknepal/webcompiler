@@ -3,88 +3,237 @@
 
 <head>
 	<title>Run C Online</title>
-
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
 	<link rel="stylesheet" type="text/css" href="css/style.css">
-	<script src="src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
-	<script src="js/jquery-1.12.4.min.js" type="text/javascript"></script>
-	<script src="js/bootstrap.min.js" type="text/javascript"></script>
+	<link rel="stylesheet" href="xterm/dist/xterm.css" />
+	<style>
 
-</head>
+@media only screen and (max-width: 558px) {
+.nav-tabs>li.active>a {
+border-bottom: 1px solid #586473;
+}
+}
 
+		.nav-tabs {
+		    padding-left: 15px;
+		    margin-bottom: 0;
+		    border: none;
+		}
+		.tab-content {
+		    border: 1px solid #ddd;
+		    border-radius: 4px;
+		    padding: 15px;
+		}
+		.right {
+		    text-align: right;
+		    float: right;
+		}
+		</style>
+
+	<script src="https://cdn.jsdelivr.net/xterm/2.6.0/xterm.js"></script>
+	<script src="xterm/dist/addons/terminado/terminado.js"></script>
+	<script src="https://cdn.jsdelivr.net/ace/1.2.6/min/ace.js" type="text/javascript" charset="utf-8"></script>
+	<script src="https://cdn.jsdelivr.net/jquery/1.12.4/jquery.min.js" type="text/javascript"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" type="text/javascript"></script></head>
 <body>
+<div class="container" id="container">
+	<h3 class="h3Title">
+		<span class="mainSpan">C</span>
+		<span class="codePlaySpan">code playground</span>
+	</h3>
+	<div class="panel panel-default">
+	
+		<div id="menuButtons">
+		<button class="btn btn-default" id="btnRun">run<span class="glyphicon glyphicon-play" aria-hidden="true"></span> </button>
+		</div>
+		<div class="panel-body">
+				<div id="playGround">
+					<ul class="nav nav-tabs" role="tablist">
+						<li id="inputText" class="active">
+							<a href="#input" role="tab" data-toggle="tab" aria-expanded="true">
+								<h4>
+									input
+								</h4> </a>
+						</li>
+						<li id="outputText" class="">
+							<a href="#output" role="tab" data-toggle="tab" aria-expanded="false">
+								<h4>
+									output
+								</h4> </a>
+						</li>
+					</ul>
+					<div class="tab-content">
+						<div class="tab-pane active" id="input">
 
-	<div class="container">
-		<h3 class="h3Title">
-			<span class="mainSpan">C</span>
-			<span class="codePlaySpan">code playground</span>
-		</h3>
-		<div class="panel panel-default">
-			<div class="panel-heading">
-				<ul class="nav nav-tabs">
-					<li>
-						<a href="index.html">Python</a>
-					</li>
-					<li class="active">
-						<a href="c.html">C</a>
-					</li>
-				</ul>
-			</div>
-			<div class="panel-body">
-				<div class="row">
-					<div class="col-md-6 pdL6">
-						<div id="menuButtons">
-							<button class="btn btn-default" id="btnRun">
-								run
-								<span class="glyphicon glyphicon-play" aria-hidden="true"></span>
-							</button>
+								<div id="ace-editor"></div>
+						</div>
+						<div class="tab-pane" id="output">
+								<div id="terminal-container"> </div>
+						
+								<textarea rows="5" cols="10" class="code" name="ace-editor" style="display: none;"></textarea>
 						</div>
 					</div>
 				</div>
-				<div class="row">
-					<div class="col-md-6 pdR0">
-						<div class="ioTxt">input</div>
-						<div id="ace-editor"></div>
-					</div>
-					<div class="col-md-6 pdL0">
-						<div class="ioTxt">output</div>
-						<textarea name="message" id="content"disabled="disabled" cols="15" rows="15" class="inline-txtarea"></textarea>
-					</div>
-				</div>
-			</div>
-			<textarea rows="5" cols="10" class="code" name="ace-editor" style="display: none;"></textarea>
+
 		</div>
+
 	</div>
 
-	<script>
-		var editor = ace.edit("ace-editor");
-		editor.setTheme("ace/theme/monokai");
+
+</div>
+
+<script>
+var code;	
+	
+	var editor = ace.edit("ace-editor");
+    var terminalOn = 'false';
+    var term = new Terminal();
+	var CodeEditor = {};
+	var firstLoad = 'true';
+	CodeEditor.init = function() {
+		editor.setTheme("ace/theme/chrome");
+		editor.$blockScrolling = Infinity;
+	}
+	
+	CodeEditor.init();
+	var getCachedCode = function(localStorageVariable, exampleCode){
+		var tempCode = localStorageVariable in localStorage ? localStorage.getItem(localStorageVariable) : exampleCode;
+		editor.setValue(tempCode, -1);
+		return tempCode;
+	}
+	
+	
+	var textarea = $('textarea[name="ace-editor"]');
+    var isTermLoaded = function(language){
+        if ((term.title != "try@host: ~") && (term.title != "try@host: /home/try")) {
+			return false;
+        } else {			
+            term.focus();
+            if (firstLoad != 'true') {
+                term.clear();
+                term.handler("clear");
+                term.keyPress({
+                    which: 13
+                });
+                term.clear();
+            }
+           
+            code = encodeURI(textarea.val());
+			firstLoad = 'false';
+			return true;
+        }
+	}
+	
+	var initTerm = function(){
+        $('#terminal-container').text("Executing your code....");
+        var protocol = (location.protocol === 'https:') ? 'wss://' : 'ws://',
+            socketURL = protocol + location.hostname + ((location.port) ? (':' + location.port) : '') + "/websocket";
+        sock = new WebSocket(socketURL);
+        sock.addEventListener('open', function() {
+            term.terminadoAttach(sock);
+        });
+
+
+
+        term.on('open', function(){
+			heartbeatIntervalId = setInterval(heartbeat, 100);
+        });
+		
+        term.open(document.getElementById('terminal-container'));
+	}
+	
+	
+	var changeToRunTab = function(){
+        $('#input').removeClass('active');
+        $('#output').addClass('active');
+        $('#inputText').removeClass('active');
+        $('#outputText').addClass('active');
+	}
+	
+
+	var Example = `#include <stdio.h>
+	int main(){
+	    printf("Hello, World!");
+	}`;	
+	
+	
+	var cachedCode = getCachedCode('cprog', Example);
+		
+	CodeEditor.initC = function() {
 		editor.getSession().setMode("ace/mode/c_cpp");
-		var textarea = $('textarea[name="ace-editor"]');
-		var messagearea = $('textarea[name="message"]');
-		editor.getSession().on("change", function() {
-			textarea.val(editor.getSession().getValue());
+		textarea.val(cachedCode);
+		
+		editor.getSession().on("change", function () {
+			cacheCode = editor.getSession().getValue();
+			textarea.val(cacheCode);
+			localStorage.setItem('cprog', cacheCode);
 		});
-		$('#btnRun').click(function() {
-			var code = encodeURI(textarea.val())
-			$.ajax({
-				type: 'POST',
-				url: 'http://127.0.0.1:5000/C/',
-				dataType: 'json',
-				data: JSON.stringify({
-					"code": code
-				}),
-				contentType: "application/json",
-				cache: false
-			}).done(function(data, textStatus, xhr) {
-				messagearea.val("Success!\n" + data[0].output);
+	}
+	
+	
 
-			}).fail(function(data, textStatus, xhr) {
-				messagearea.val("Error!\n" + data.responseJSON[0].error);
-			});
-		});
-	</script>
+	CodeEditor.initC();
 
+	var heartbeat = function(){
+		if(isTermLoaded() == true) {
+			clearInterval(heartbeatIntervalId);
+			runC();
+		}
+	}
+	
+	var heartbeatIntervalId;
+	
+   var runC = function(){
+   var code = encodeURI(textarea.val().replace(/[\u2018\u2019]/g, "'").replace(/[\u201C\u201D]/g, '"'));
+        $.ajax({
+            type: 'POST',
+            url: 'https://host:81/C/',
+            dataType: 'json',
+            data: JSON.stringify({
+                "code": code
+            }),
+            contentType: "application/json",
+            cache: false
+        }).done(function(data, textStatus, xhr) {
+	      term.focus();
+            if (firstLoad != 'true') {
+                term.clear();
+                term.handler("clear");
+                term.keyPress({
+                    which: 13
+                });
+                term.clear();
+            }
+            term.handler("gcc -w " + data[0].file + ".c" + " -o " + data[0].file + " -lm && " + data[0].file + " || echo ");
+            term.keyPress({
+                which: 13
+            });
+           
+        }).fail(function(data, textStatus, xhr) {
+	    term.reset();
+	    term.clear();
+            term.writeln("\n\nThere seems to be something wrong with this program.");
+	    term.writeln("\nPlease report the error at ... and we will fix it as soon as possible.");
+        });
+	}
+   
+   
+    $('#btnRun').click(function() {
+        if (terminalOn == 'false') {
+          	initTerm();
+            terminalOn = 'true';
+
+        } else {
+            runC();
+        }
+
+		changeToRunTab();
+    });
+
+   
+</script>
 </body>
 
 </html>
+

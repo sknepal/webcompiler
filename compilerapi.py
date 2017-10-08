@@ -1,9 +1,14 @@
+from gevent import monkey; monkey.patch_all()
 from flask import Flask, request
 from flask_restful import Resource, Api, reqparse
 from flask import jsonify
+from flask_cors import CORS, cross_origin
 import subprocess
-import urllib, os, sys
+import os.path
+import urllib, os, uuid
+from datetime import datetime
 app = Flask(__name__)
+CORS(app)
 api = Api(app)
 
 class RunC(Resource):
@@ -12,52 +17,14 @@ class RunC(Resource):
       parser.add_argument('code', type=str, required=True, location='json')
       args = parser.parse_args(strict=True)
       code=urllib.unquote(args['code']).decode('utf8') 
-      #print code
       response = []
-      with open('test.c', 'w') as file:
+      unique_filename = str(uuid.uuid4())
+      unique_filename = unique_filename[:5]
+      with open('/tmp/'+unique_filename+'.c', 'w') as file:
          file.write(code)
-      p = subprocess.Popen(['gcc', 'test.c', '-o', 'test'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-      out, err = p.communicate()
-      if os.path.exists('test.c'):
-          os.remove('test.c')
-      if (err):
-          print "Error"
-          response.append({'error':err})
-          return response, 412
-      print "Success"
-      q = subprocess.check_output(['./test'])
-      response.append({'output':q})
-      if os.path.exists('test'):
-          os.remove('test')
+      response.append({'file':unique_filename})
       return response, 200
-      
 
-class RunPython(Resource):
-   def post(self):
-      parser = reqparse.RequestParser()
-      parser.add_argument('code', type=str, required=True, location='json')
-      args = parser.parse_args(strict=True)
-      code=urllib.unquote(args['code']).decode('utf8') 
-      print code
-      response = []
-      with open('test.py', 'w') as file:
-         file.write(code)
-      p = subprocess.Popen(['python', 'test.py'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-      out, err = p.communicate()
-      if os.path.exists('test.py'):
-          os.remove('test.py')
-      if (err):
-          print "Error"
-          response.append({'error':err})
-          return response, 412
-      print "Success"
-      response.append({'output':out})
-      return response, 200
-      
-           
-        
 api.add_resource(RunC, '/C/')
-api.add_resource(RunPython, '/python/')
-
 if __name__ == '__main__':
-    app.run(threaded=True)
+    app.run(host='0.0.0.0',port=81)
