@@ -111,8 +111,8 @@ sudo service nginx restart
   Here the code is basically trying to check if the terminal is loaded on the site or not. So it is checking the prompt and if the prompt is not equal to *try@host* or *try@host: /home/try* then its saying the terminal is not loaded yet. Depending upon the username of the system, you will need to change 'try' to your username and 'host' to your IP. If you are still having problem: try removing this 'if case' and see what comes up as prompt on the terminal and then use that prompt for conditional check here later on.
 	
 ### Setup Terminal Backend
-1. First locate where tornado package is installed. In most cases it is installed in the `/usr/local/lib/python2.7` directory. You can find out by entering `locate tornado` on the terminal.
-2. Edit the *websocket.py* file and make the following changes. 
+1. First locate where tornado and terminado packages are installed. In most cases they are installed in the `/usr/local/lib/python2.7` directory. You can find out by entering `locate tornado` and `locate terminado` on the terminal.
+2. Edit the *websocket.py* file in tornado's package directory and make the following changes:
   * On ***def check_origin***: comment everything and add new line: ***return True***
 3. In order to make sure that Firejail is exited upon websocket close, add the following in the terminado/management.py:
 ```
