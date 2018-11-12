@@ -277,8 +277,8 @@ crontab -e
       start program = "/etc/init.d/nginx start"
       stop program = "/etc/init.d/nginx stop"
       if does not exist then restart
-      if failed host 108.61.117.85 port 80 protocol http
-          and request "/index.html"
+      if failed host YOUR_SERVER_IP_ADDRESS port 80 protocol http
+          and request "/C.html"
           with timeout 25 seconds
           for 4 times within 4 cycles
           then restart
