@@ -108,7 +108,7 @@ sudo service nginx restart
      
   *ie.  if ((term.title != "try@host: ~") && (term.title != "try@host: /home/try")) {*
     
-  Here the code is basically trying to check if the terminal is loaded on the site or not. So it is checking the prompt and if the prompt is equal to *try@host* or *try@host: /home/try* then its saying the terminal is not loaded yet. Depending upon the username of the system, you will need to change 'try' to your username and 'host' to your IP. If you are still having problem: try removing this 'if case' and see what comes up as prompt on the terminal and then use that prompt for conditional check here later on.
+  Here the code is basically trying to check if the terminal is loaded on the site or not. So it is checking the prompt and if the prompt is not equal to *try@host* or *try@host: /home/try* then its saying the terminal is not loaded yet. Depending upon the username of the system, you will need to change 'try' to your username and 'host' to your IP. If you are still having problem: try removing this 'if case' and see what comes up as prompt on the terminal and then use that prompt for conditional check here later on.
 	
 ### Setup Terminal Backend
 1. First locate where tornado package is installed. In most cases it is installed in the `/usr/local/lib/python2.7` directory. You can find out by entering `locate tornado` on the terminal.
